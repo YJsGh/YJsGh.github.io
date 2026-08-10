@@ -1,0 +1,41 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate, isoDate } from '../../lib/date';
+
+const [projects, devlog] = await Promise.all([
+  getCollection('projects'),
+  getCollection('devlog'),
+]);
+
+const devlogCounts = new Map<string, number>();
+for (const entry of devlog) {
+  const id = entry.data.project.id;
+  devlogCounts.set(id, (devlogCounts.get(id) ?? 0) + 1);
+}
+
+const entries = projects.sort((a, b) => b.data.startDate.valueOf() - a.data.startDate.valueOf());
+---
+
+<BaseLayout title="프로젝트" description="개발일지의 허브.">
+  <h1>프로젝트</h1>
+
+  <ul>
+    {
+      entries.map(({ id, data }) => (
+        <li>
+          <a href={`/projects/${id}/`}>{data.title}</a>
+          <br />
+          {data.description && (
+            <>
+              <small>{data.description}</small>
+              <br />
+            </>
+          )}
+          <time datetime={isoDate(data.startDate)}>{formatDate(data.startDate)}</time> · 개발일지{' '}
+          {devlogCounts.get(id) ?? 0}편
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>

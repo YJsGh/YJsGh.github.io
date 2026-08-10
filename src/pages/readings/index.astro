@@ -1,0 +1,31 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate, isoDate } from '../../lib/date';
+import { mediumLabels } from '../../lib/medium';
+
+const readings = (await getCollection('readings')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<BaseLayout title="감상" description="외부 작품에 대한 글.">
+  <h1>감상</h1>
+
+  <ul>
+    {
+      readings.map(({ id, data }) => (
+        <li>
+          <a href={`/readings/${id}/`}>{data.title}</a>
+          <br />
+          <small>
+            {data.work.title} · {data.work.creator} · {data.work.year} ·{' '}
+            {mediumLabels[data.work.medium]}
+          </small>
+          <br />
+          <time datetime={isoDate(data.pubDate)}>{formatDate(data.pubDate)}</time>
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>

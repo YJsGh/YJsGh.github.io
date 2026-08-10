@@ -1,0 +1,53 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { formatDate, isoDate } from '../lib/date';
+
+const sections = [
+  { href: '/essays/', label: '에세이', note: '대상이 없는 사유 글.' },
+  { href: '/readings/', label: '감상', note: '외부 작품에 대한 글.' },
+  { href: '/devlog/', label: '개발일지', note: '프로젝트에 종속된 기록.' },
+  { href: '/projects/', label: '프로젝트', note: '개발일지의 허브.' },
+];
+
+const [essays, readings, devlog] = await Promise.all([
+  getCollection('essays'),
+  getCollection('readings'),
+  getCollection('devlog'),
+]);
+
+const recent = [
+  ...essays.map((entry) => ({ ...entry, base: '/essays' })),
+  ...readings.map((entry) => ({ ...entry, base: '/readings' })),
+  ...devlog.map((entry) => ({ ...entry, base: '/devlog' })),
+]
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+  .slice(0, 5);
+---
+
+<BaseLayout title="yj" description="에세이, 감상, 개발일지를 모아두는 곳.">
+  <h1>yj</h1>
+
+  <ul>
+    {
+      sections.map((section) => (
+        <li>
+          <a href={section.href}>{section.label}</a> — {section.note}
+        </li>
+      ))
+    }
+  </ul>
+
+  <h2>최근 글</h2>
+  <ul>
+    {
+      recent.map((entry) => (
+        <li>
+          <a href={`${entry.base}/${entry.id}/`}>{entry.data.title}</a>
+          <br />
+          <time datetime={isoDate(entry.data.pubDate)}>{formatDate(entry.data.pubDate)}</time>
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>

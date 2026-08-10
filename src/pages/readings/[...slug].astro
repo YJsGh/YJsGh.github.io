@@ -1,0 +1,42 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate, isoDate } from '../../lib/date';
+import { mediumLabels } from '../../lib/medium';
+
+export async function getStaticPaths() {
+  const readings = await getCollection('readings');
+  return readings.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+interface Props {
+  entry: CollectionEntry<'readings'>;
+}
+
+const { entry } = Astro.props;
+const { work } = entry.data;
+const { Content } = await render(entry);
+---
+
+<BaseLayout title={entry.data.title} description={entry.data.description}>
+  <article>
+    <h1>{entry.data.title}</h1>
+    <p>
+      <time datetime={isoDate(entry.data.pubDate)}>{formatDate(entry.data.pubDate)}</time>
+    </p>
+
+    <dl>
+      <dt>작품</dt>
+      <dd>{work.title}</dd>
+      <dt>만든 사람</dt>
+      <dd>{work.creator}</dd>
+      <dt>발표</dt>
+      <dd>{work.year}</dd>
+      <dt>매체</dt>
+      <dd>{mediumLabels[work.medium]}</dd>
+    </dl>
+
+    <Content />
+  </article>
+</BaseLayout>

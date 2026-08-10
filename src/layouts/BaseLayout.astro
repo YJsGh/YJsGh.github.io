@@ -1,0 +1,90 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description } = Astro.props;
+const siteName = 'yj';
+
+const nav = [
+  { href: '/essays/', label: '에세이' },
+  { href: '/readings/', label: '감상' },
+  { href: '/devlog/', label: '개발일지' },
+  { href: '/projects/', label: '프로젝트' },
+];
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title === siteName ? title : `${title} — ${siteName}`}</title>
+    {description && <meta name="description" content={description} />}
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+  </head>
+  <body>
+    <header>
+      <a href="/" rel="home">{siteName}</a>
+      <nav>
+        {
+          nav.map((item) => (
+            <a
+              href={item.href}
+              aria-current={Astro.url.pathname.startsWith(item.href) ? 'page' : undefined}
+            >
+              {item.label}
+            </a>
+          ))
+        }
+      </nav>
+    </header>
+
+    <main>
+      <slot />
+    </main>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    color-scheme: light dark;
+  }
+
+  body {
+    max-width: 42rem;
+    margin: 0 auto;
+    padding: 2rem 1.25rem 6rem;
+    line-height: 1.7;
+  }
+
+  header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+  }
+
+  header nav {
+    display: flex;
+    gap: 1rem;
+  }
+
+  header [aria-current='page'] {
+    font-weight: 700;
+  }
+
+  ul {
+    padding: 0;
+    list-style: none;
+  }
+
+  time {
+    opacity: 0.7;
+    font-variant-numeric: tabular-nums;
+  }
+</style>

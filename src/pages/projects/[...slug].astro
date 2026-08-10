@@ -1,0 +1,58 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate, isoDate } from '../../lib/date';
+
+export async function getStaticPaths() {
+  const [projects, devlog] = await Promise.all([
+    getCollection('projects'),
+    getCollection('devlog'),
+  ]);
+
+  return projects.map((entry) => ({
+    params: { slug: entry.id },
+    props: {
+      entry,
+      devlog: devlog
+        .filter((post) => post.data.project.id === entry.id)
+        .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()),
+    },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'projects'>;
+  devlog: CollectionEntry<'devlog'>[];
+}
+
+const { entry, devlog } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<BaseLayout title={entry.data.title} description={entry.data.description}>
+  <article>
+    <h1>{entry.data.title}</h1>
+    <p>
+      시작 <time datetime={isoDate(entry.data.startDate)}>{formatDate(entry.data.startDate)}</time>
+    </p>
+    <Content />
+  </article>
+
+  <h2>개발일지</h2>
+  {
+    devlog.length === 0 ? (
+      <p>아직 기록이 없습니다.</p>
+    ) : (
+      <ul>
+        {devlog.map(({ id, data }) => (
+          <li>
+            <a href={`/devlog/${id}/`}>{data.title}</a>
+            <br />
+            <time datetime={isoDate(data.pubDate)}>{formatDate(data.pubDate)}</time>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</BaseLayout>
