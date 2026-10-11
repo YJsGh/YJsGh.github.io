@@ -1,4 +1,4 @@
-/** readings 스키마의 medium enum을 화면에 보여줄 이름. */
+/** posts 스키마의 work.medium enum을 화면에 보여줄 한글 이름. */
 export const mediumLabels = {
   film: '영화',
   game: '게임',

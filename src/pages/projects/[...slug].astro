@@ -3,6 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { formatDate, isoDate } from '../../lib/date';
+import { sections } from '../../lib/sections';
 
 export async function getStaticPaths() {
   const [projects, devlog] = await Promise.all([
@@ -39,7 +40,7 @@ const { Content } = await render(entry);
     <Content />
   </article>
 
-  <h2>개발일지</h2>
+  <h2>{sections.devlog.label}</h2>
   {
     devlog.length === 0 ? (
       <p>아직 기록이 없습니다.</p>

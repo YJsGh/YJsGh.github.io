@@ -2,6 +2,9 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { formatDate, isoDate } from '../../lib/date';
+import { sections } from '../../lib/sections';
+
+const section = sections.devlog;
 
 const [devlog, projects] = await Promise.all([
   getCollection('devlog'),
@@ -13,8 +16,8 @@ const projectTitles = new Map(projects.map((project) => [project.id, project.dat
 const entries = devlog.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
-<BaseLayout title="개발일지" description="프로젝트에 종속된 개발 기록.">
-  <h1>개발일지</h1>
+<BaseLayout title={section.label} description={section.description}>
+  <h1>{section.label}</h1>
 
   <ul>
     {

@@ -2,6 +2,9 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { formatDate, isoDate } from '../../lib/date';
+import { sections } from '../../lib/sections';
+
+const section = sections.projects;
 
 const [projects, devlog] = await Promise.all([
   getCollection('projects'),
@@ -17,8 +20,8 @@ for (const entry of devlog) {
 const entries = projects.sort((a, b) => b.data.startDate.valueOf() - a.data.startDate.valueOf());
 ---
 
-<BaseLayout title="프로젝트" description="개발일지의 허브.">
-  <h1>프로젝트</h1>
+<BaseLayout title={section.label} description={section.description}>
+  <h1>{section.label}</h1>
 
   <ul>
     {
@@ -32,8 +35,8 @@ const entries = projects.sort((a, b) => b.data.startDate.valueOf() - a.data.star
               <br />
             </>
           )}
-          <time datetime={isoDate(data.startDate)}>{formatDate(data.startDate)}</time> · 개발일지{' '}
-          {devlogCounts.get(id) ?? 0}편
+          <time datetime={isoDate(data.startDate)}>{formatDate(data.startDate)}</time> ·{' '}
+          {sections.devlog.label} {devlogCounts.get(id) ?? 0}편
         </li>
       ))
     }

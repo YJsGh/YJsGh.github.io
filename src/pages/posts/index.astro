@@ -1,0 +1,35 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate, isoDate } from '../../lib/date';
+import { sections } from '../../lib/sections';
+import { workBrief } from '../../lib/work';
+
+const section = sections.posts;
+
+const posts = (await getCollection('posts')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<BaseLayout title={section.label} description={section.description}>
+  <h1>{section.label}</h1>
+
+  <ul>
+    {
+      posts.map(({ id, data }) => (
+        <li>
+          <a href={`/posts/${id}/`}>{data.title}</a>
+          <br />
+          {data.work && (
+            <>
+              <span class="work">{workBrief(data.work)}</span>
+              <br />
+            </>
+          )}
+          <time datetime={isoDate(data.pubDate)}>{formatDate(data.pubDate)}</time>
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>
